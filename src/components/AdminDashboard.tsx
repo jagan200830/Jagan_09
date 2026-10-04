@@ -3,6 +3,7 @@ import {
   AlertCircle,
   Award,
   Bell,
+  Check,
   CheckCircle,
   FileText,
   Layers,
@@ -38,15 +39,22 @@ export const AdminDashboard: React.FC = () => {
 
   const pendingPros = pros.filter((p) => p.verificationStatus === 'pending');
   const verifiedPros = pros.filter((p) => p.verificationStatus === 'verified');
+  const approvedPros = pros.filter((p) => p.verificationStatus === 'approved');
+  const rejectedPros = pros.filter((p) => p.verificationStatus === 'rejected');
   const totalVolume = bookings.reduce((sum, b) => sum + b.totalAmount, 0);
 
-  const handleApprove = (proId: string) => {
+  const handleNormalApprove = (proId: string) => {
+    store.updateVerificationStatus(proId, 'approved');
+    setSelectedProForReview(null);
+  };
+
+  const handleApproveWithBadge = (proId: string) => {
     store.updateVerificationStatus(proId, 'verified');
     setSelectedProForReview(null);
   };
 
-  const handleReject = (proId: string) => {
-    store.updateVerificationStatus(proId, 'rejected');
+  const handleReject = (proId: string, reason?: string) => {
+    store.updateVerificationStatus(proId, 'rejected', reason);
     setSelectedProForReview(null);
   };
 
@@ -212,26 +220,36 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button
                       onClick={() => setSelectedProForReview(pro)}
-                      className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white flex items-center gap-1.5 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       View Docs
                     </button>
                     <button
                       onClick={() => handleReject(pro.id)}
-                      className="px-3 py-2 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/40 border border-rose-500/30 transition-colors"
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-950/40 border border-rose-500/30 transition-colors flex items-center gap-1 cursor-pointer"
                     >
+                      <XCircle className="w-3.5 h-3.5" />
                       Reject
                     </button>
                     <button
-                      onClick={() => handleApprove(pro.id)}
-                      className="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition-colors shadow-sm flex items-center gap-1.5"
+                      onClick={() => handleNormalApprove(pro.id)}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-950 text-sky-300 hover:bg-sky-900 border border-sky-500/40 transition-colors shadow-sm flex items-center gap-1 cursor-pointer"
+                      title="Normal approve without verified badge - Pro becomes visible to customers"
                     >
-                      <CheckCircle className="w-4 h-4" />
-                      Approve & Grant Badge
+                      <Check className="w-3.5 h-3.5 text-sky-400" />
+                      Normal Approve
+                    </button>
+                    <button
+                      onClick={() => handleApproveWithBadge(pro.id)}
+                      className="px-4 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 transition-colors shadow-sm flex items-center gap-1 cursor-pointer"
+                      title="Approve with official Verified Worker-Owner Badge - Pro becomes visible with verified checkmark"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-slate-950" />
+                      Approve with Verified Badge
                     </button>
                   </div>
                 </div>
@@ -239,31 +257,120 @@ export const AdminDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Already Verified Pros List */}
+          {/* Active Approved & Verified Pros List */}
           <div className="space-y-3 pt-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-              Active Verified Worker-Owners ({verifiedPros.length})
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                Active Live Professionals ({verifiedPros.length + approvedPros.length})
+              </h3>
+              <span className="text-[11px] text-slate-400">
+                {verifiedPros.length} with Verified Badge · {approvedPros.length} Normal Approved
+              </span>
+            </div>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {verifiedPros.map((pro) => (
-                <div key={pro.id} className="p-4 rounded-2xl glass-card border-slate-800 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <TradeAvatar name={pro.name} category={pro.category} size="lg" />
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <h4 className="text-xs font-bold text-white">{pro.name}</h4>
-                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+              {[...verifiedPros, ...approvedPros].map((pro) => {
+                const isBadge = pro.verificationStatus === 'verified';
+                return (
+                  <div key={pro.id} className="p-4 rounded-2xl glass-card border-slate-800 flex flex-col justify-between gap-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <TradeAvatar name={pro.name} category={pro.category} size="lg" />
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-xs font-bold text-white">{pro.name}</h4>
+                            {isBadge && (
+                              <span title="Verified Worker-Owner">
+                                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-400">{pro.category} · {pro.rating}★ · {pro.completedJobs} jobs</p>
+                          <p className="text-[10px] text-slate-500">{pro.location}</p>
+                        </div>
                       </div>
-                      <p className="text-[11px] text-slate-400">{pro.category} · {pro.rating}★ · {pro.completedJobs} jobs</p>
+
+                      {isBadge ? (
+                        <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30 shrink-0 flex items-center gap-1">
+                          <ShieldCheck className="w-3 h-3" /> Verified Badge
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-sky-400 bg-sky-950/80 px-2 py-0.5 rounded-full border border-sky-500/30 shrink-0 flex items-center gap-1">
+                          <Check className="w-3 h-3" /> Approved (Normal)
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/80 text-[11px]">
+                      {isBadge ? (
+                        <button
+                          onClick={() => handleNormalApprove(pro.id)}
+                          className="px-2.5 py-1 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+                          title="Remove verified badge but keep normal approval"
+                        >
+                          Remove Badge
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleApproveWithBadge(pro.id)}
+                          className="px-2.5 py-1 rounded-lg font-semibold text-emerald-400 hover:bg-emerald-950/40 border border-emerald-500/30 transition-colors"
+                          title="Grant official Verified Badge"
+                        >
+                          + Grant Verified Badge
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleReject(pro.id)}
+                        className="px-2.5 py-1 rounded-lg text-rose-400 hover:bg-rose-950/40 transition-colors"
+                        title="Revoke and reject access"
+                      >
+                        Reject / Suspend
+                      </button>
                     </div>
                   </div>
-                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                    Active Verified
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
+
+          {/* Rejected Applications List */}
+          {rejectedPros.length > 0 && (
+            <div className="space-y-3 pt-4 border-t border-slate-800">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-rose-400">
+                Rejected Applications ({rejectedPros.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {rejectedPros.map((pro) => (
+                  <div key={pro.id} className="p-4 rounded-2xl bg-rose-950/10 border border-rose-500/20 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <TradeAvatar name={pro.name} category={pro.category} size="md" />
+                      <div>
+                        <h4 className="text-xs font-bold text-white">{pro.name}</h4>
+                        <p className="text-[11px] text-slate-400">{pro.category} · {pro.location}</p>
+                        <span className="text-[10px] text-rose-400 font-semibold">Status: Rejected</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => handleNormalApprove(pro.id)}
+                        className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200"
+                        title="Re-approve as Normal"
+                      >
+                        Normal Approve
+                      </button>
+                      <button
+                        onClick={() => handleApproveWithBadge(pro.id)}
+                        className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500 hover:bg-emerald-400 text-slate-950"
+                        title="Re-approve with Badge"
+                      >
+                        Approve with Badge
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -438,18 +545,28 @@ export const AdminDashboard: React.FC = () => {
               <p>Declared Skills: {selectedProForReview.skills.join(', ')}</p>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => handleReject(selectedProForReview.id)}
-                className="px-4 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-950/40 rounded-xl"
+                className="px-3.5 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-950/40 rounded-xl border border-rose-500/30 transition-colors cursor-pointer"
               >
                 Reject Application
               </button>
               <button
-                onClick={() => handleApprove(selectedProForReview.id)}
-                className="px-5 py-2 text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl"
+                onClick={() => handleNormalApprove(selectedProForReview.id)}
+                className="px-4 py-2 text-xs font-bold bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-500/40 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Normal Approve without verified badge"
               >
-                Approve & Grant Verified Badge
+                <Check className="w-3.5 h-3.5 text-sky-400" />
+                Normal Approve
+              </button>
+              <button
+                onClick={() => handleApproveWithBadge(selectedProForReview.id)}
+                className="px-5 py-2 text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 rounded-xl shadow-md transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Approve with official Verified Worker-Owner Badge"
+              >
+                <ShieldCheck className="w-4 h-4 text-slate-950" />
+                Approve with Verified Badge
               </button>
             </div>
           </div>

@@ -1,6 +1,6 @@
 export type UserRole = 'customer' | 'professional' | 'admin';
 
-export type VerificationStatus = 'pending' | 'verified' | 'rejected';
+export type VerificationStatus = 'pending' | 'approved' | 'verified' | 'rejected';
 
 export type BookingStatus =
   | 'requested'

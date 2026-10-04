@@ -41,7 +41,7 @@ export const ServiceSearchPage: React.FC<ServiceSearchPageProps> = ({
   const [favorites, setFavorites] = useState<string[]>(store.favorites);
 
   const categories = ['All', ...store.categories.map((c) => c.name)];
-  const allPros = store.professionals;
+  const allPros = store.getApprovedProfessionals();
 
   const toggleFav = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();

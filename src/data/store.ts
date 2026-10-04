@@ -413,23 +413,50 @@ export class PlatformStore {
   }
 
   // --- Verification ---
-  public updateVerificationStatus(proId: string, status: VerificationStatus): void {
+  public updateVerificationStatus(proId: string, status: VerificationStatus, note?: string): void {
     const pro = this.professionals.find((p) => p.id === proId);
     if (pro) {
       pro.verificationStatus = status;
       pro.isVerified = status === 'verified';
+
+      const user = this.users.find((u) => u.id === proId);
+      if (user) {
+        user.isVerified = status === 'verified';
+      }
+      if (this.currentUser && this.currentUser.id === proId) {
+        this.currentUser.isVerified = status === 'verified';
+      }
+
+      let notifTitle = 'Registration Status Updated';
+      let notifMessage = 'Your application was reviewed.';
+
+      if (status === 'verified') {
+        notifTitle = '🎉 Approved with Verified Badge!';
+        notifMessage = 'Congratulations! Admin approved your application with the official Verified Worker-Owner Badge. Your profile is now live to all customers.';
+      } else if (status === 'approved') {
+        notifTitle = '✓ Application Approved!';
+        notifMessage = 'Admin has approved your service registration. You are now live on the platform and visible to customers for bookings.';
+      } else if (status === 'rejected') {
+        notifTitle = 'Application Rejected';
+        notifMessage = note || 'Your service registration application was rejected by admin. You will not appear in customer searches.';
+      }
+
       this.addNotification({
         userId: pro.id,
         role: 'professional',
-        title: status === 'verified' ? 'Congratulations! You are Verified ✓' : 'Verification Status Updated',
-        message:
-          status === 'verified'
-            ? 'Your cooperative documents and skills have been approved. The Verified Badge is now active on your profile.'
-            : 'Your verification was reviewed. Please check compliance guidelines.',
+        title: notifTitle,
+        message: notifMessage,
         type: 'verification',
       });
+      this.save();
       this.notify();
     }
+  }
+
+  public getApprovedProfessionals(): ServiceProfessional[] {
+    return this.professionals.filter(
+      (p) => p.verificationStatus === 'verified' || p.verificationStatus === 'approved'
+    );
   }
 
   // --- Bookings ---

@@ -99,11 +99,26 @@ export const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({ on
             className="ring-2 ring-emerald-500/40 shrink-0"
           />
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <h1 className="font-heading text-2xl font-bold text-white">{currentPro.name}</h1>
               {currentPro.verificationStatus === 'verified' && (
-                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3" /> Verified Worker-Owner
+                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1 shadow-sm">
+                  <CheckCircle className="w-3 h-3" /> Verified Worker-Owner Badge
+                </span>
+              )}
+              {currentPro.verificationStatus === 'approved' && (
+                <span className="text-[10px] font-bold text-sky-400 bg-sky-950/80 px-2.5 py-0.5 rounded-full border border-sky-500/30 flex items-center gap-1 shadow-sm">
+                  <CheckCircle className="w-3 h-3" /> Approved Partner (Standard)
+                </span>
+              )}
+              {currentPro.verificationStatus === 'pending' && (
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/40 flex items-center gap-1 animate-pulse">
+                  <Clock className="w-3 h-3" /> Pending Admin Approval
+                </span>
+              )}
+              {currentPro.verificationStatus === 'rejected' && (
+                <span className="text-[10px] font-bold text-rose-400 bg-rose-950/80 px-2.5 py-0.5 rounded-full border border-rose-500/40 flex items-center gap-1">
+                  <X className="w-3 h-3" /> Application Rejected
                 </span>
               )}
             </div>
@@ -160,6 +175,31 @@ export const ProfessionalDashboard: React.FC<ProfessionalDashboardProps> = ({ on
           </button>
         </div>
       </div>
+
+      {/* Notice Banner for Pending or Rejected Status */}
+      {currentPro.verificationStatus === 'pending' && (
+        <div className="p-5 rounded-3xl bg-amber-950/40 border border-amber-500/40 flex items-start gap-3.5 text-xs text-amber-200 shadow-xl">
+          <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 animate-pulse" />
+          <div className="space-y-1">
+            <h4 className="font-bold text-sm text-white">Application Pending Admin Approval</h4>
+            <p className="text-amber-300/90 leading-relaxed">
+              Your service person registration is awaiting administrative review. To protect customers, you will only be displayed in customer searches and begin receiving job requests <strong>after approval by an administrator</strong> (with either normal approval or a verified badge).
+            </p>
+          </div>
+        </div>
+      )}
+
+      {currentPro.verificationStatus === 'rejected' && (
+        <div className="p-5 rounded-3xl bg-rose-950/40 border border-rose-500/40 flex items-start gap-3.5 text-xs text-rose-200 shadow-xl">
+          <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h4 className="font-bold text-sm text-white">Application Not Approved</h4>
+            <p className="text-rose-300/90 leading-relaxed">
+              Your registration application was not approved by platform administration. Your profile is not displayed to customers. Please reach out to platform operations if you have questions.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">

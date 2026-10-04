@@ -47,7 +47,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const categories = store.categories;
   const services = store.services;
   const coopGroups = store.coopGroups;
-  const professionals = store.professionals.filter((p) => p.isVerified);
+  const professionals = store.getApprovedProfessionals();
   const currentUser = store.currentUser;
   const activeBookings = store.bookings.filter(
     (b) => b.customerId === currentUser.id && !['completed', 'cancelled'].includes(b.status)
@@ -391,7 +391,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="min-w-0">
                   <div className="flex items-center gap-1">
                     <h3 className="text-sm font-bold text-white truncate">{pro.name}</h3>
-                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    {pro.verificationStatus === 'verified' && (
+                      <span title="Verified Worker-Owner">
+                        <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-400 truncate">{pro.category}</p>
                   <div className="flex items-center gap-2 mt-1 text-[11px]">

@@ -57,7 +57,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   onBookingSuccess,
   onOpenChat,
 }) => {
-  const pros = store.professionals;
+  const pros = store.getApprovedProfessionals();
   const services = store.services;
 
   const [selectedProId, setSelectedProId] = useState<string>(

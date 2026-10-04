@@ -26,7 +26,7 @@ export const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
   onSelectPro,
   onBookPro,
 }) => {
-  const pros = store.professionals;
+  const pros = store.getApprovedProfessionals();
   const [selectedProId, setSelectedProId] = useState<string>(pros[0]?.id || '');
   const [radiusKm, setRadiusKm] = useState<number>(12);
   const [emergencyOnly, setEmergencyOnly] = useState<boolean>(false);
@@ -163,7 +163,11 @@ export const InteractiveMapView: React.FC<InteractiveMapViewProps> = ({
               >
                 <div className="flex items-center gap-1">
                   <span className="text-[11px] font-bold text-white">{pro.name}</span>
-                  <CheckCircle className="w-3 h-3 text-emerald-400" />
+                  {pro.verificationStatus === 'verified' && (
+                    <span title="Verified Worker-Owner">
+                      <CheckCircle className="w-3 h-3 text-emerald-400" />
+                    </span>
+                  )}
                 </div>
                 <div className="text-[10px] text-slate-300">
                   {pro.category} · <span className="text-emerald-400">{getProDistance(pro, store.currentUser.location).displayTransit}</span>

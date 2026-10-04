@@ -41,7 +41,7 @@ export const GigAssistAI: React.FC<GigAssistAIProps> = ({ onSelectProToBook, onO
   const [analysis, setAnalysis] = useState<AIAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const allPros = store.professionals;
+  const allPros = store.getApprovedProfessionals();
   const allServices = store.services;
 
   const handleDiagnose = async (textToAnalyze?: string) => {

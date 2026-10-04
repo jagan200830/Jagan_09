@@ -122,7 +122,8 @@ export default function App() {
   };
 
   const handleSelectServiceFromLanding = (service: ServiceItem) => {
-    const pro = store.professionals.find((p) => p.category === service.category) || store.professionals[0];
+    const approvedPros = store.getApprovedProfessionals();
+    const pro = approvedPros.find((p) => p.category === service.category) || approvedPros[0] || store.professionals[0];
     setBookingPro(pro);
     setBookingService(service);
     setBookingEmergency(service.emergencyEligible);
@@ -157,7 +158,8 @@ export default function App() {
   };
 
   const handleBookCoopGroup = (group: CooperativeGroup) => {
-    const firstPro = store.professionals.find((p) => group.memberIds.includes(p.id)) || store.professionals[0];
+    const approvedPros = store.getApprovedProfessionals();
+    const firstPro = approvedPros.find((p) => group.memberIds.includes(p.id)) || approvedPros[0] || store.professionals[0];
     setBookingPro(firstPro);
     setBookingService(store.services[0]);
     setBookingNotes(`Cooperative Squad Request: ${group.name}`);
@@ -165,7 +167,8 @@ export default function App() {
   };
 
   const handleOpenEmergencyDispatch = () => {
-    const emergencyPro = store.professionals.find((p) => p.emergencyAvailable) || store.professionals[0];
+    const approvedPros = store.getApprovedProfessionals();
+    const emergencyPro = approvedPros.find((p) => p.emergencyAvailable) || approvedPros[0] || store.professionals[0];
     setBookingPro(emergencyPro);
     setBookingService(store.services[0]);
     setBookingNotes('CRITICAL 24/7 EMERGENCY DISPATCH: Need immediate on-call technician.');
@@ -210,7 +213,7 @@ export default function App() {
         }}
         onOpenAuth={() => setAuthModalOpen(true)}
         onOpenBooking={() => {
-          setBookingPro(store.professionals[0]);
+          setBookingPro(store.getApprovedProfessionals()[0] || store.professionals[0]);
           setBookingService(store.services[0]);
           setBookingModalOpen(true);
         }}
@@ -276,7 +279,7 @@ export default function App() {
           <CustomerDashboard
             onOpenAIWithPrompt={handleOpenAIWithPrompt}
             onOpenBookingModal={() => {
-              setBookingPro(store.professionals[0]);
+              setBookingPro(store.getApprovedProfessionals()[0] || store.professionals[0]);
               setBookingService(store.services[0]);
               setBookingModalOpen(true);
             }}

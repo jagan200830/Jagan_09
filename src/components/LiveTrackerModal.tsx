@@ -144,148 +144,202 @@ export const LiveTrackerModal: React.FC<LiveTrackerModalProps> = ({
           </button>
         </div>
 
-        {/* Live Distance & ETA Stat Strip - COMPUTED FROM PHYSICAL DISTANCE */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Distance to Location
-            </span>
-            <span className="font-mono text-xl sm:text-2xl font-bold text-white">
-              {transitProgress >= 95 ? '0.0 km' : `${distanceRemaining} km`}
-            </span>
-            <span className="text-[10px] text-slate-400 block mt-0.5">
-              Calculated from route
-            </span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
-              Estimated Travel Time
-            </span>
-            <span className="font-mono text-xl sm:text-2xl font-bold text-emerald-400">
-              {transitProgress >= 95 ? 'Arrived' : `~${etaMinutesRemaining} mins`}
-            </span>
-            <span className="text-[10px] text-emerald-300/80 block mt-0.5">
-              Based on {initialDistanceKm} km distance
-            </span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Transit Vehicle
-            </span>
-            <span className="font-medium text-xs sm:text-sm text-slate-200 block truncate mt-1">
-              Two-Wheeler Mobile Toolkit
-            </span>
-            <span className="text-[10px] text-slate-400 font-mono">
-              KA-03-EM-8821
-            </span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Safety PIN
-            </span>
-            <span className="font-mono text-xl sm:text-2xl font-bold text-amber-400">
-              {booking.id.slice(-4).toUpperCase()}
-            </span>
-            <span className="text-[10px] text-slate-400 block mt-0.5">
-              Share with partner on arrival
-            </span>
-          </div>
-        </div>
-
-        {/* Live Vector Radar & Route Map Visualizer */}
-        <div className="relative w-full h-[280px] sm:h-[320px] rounded-3xl overflow-hidden border border-slate-700/80 bg-[#090f1d] shadow-inner select-none">
-          {/* Subtle Grid Matrix */}
-          <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:32px_32px]" />
-
-          {/* Radar Waves */}
-          <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-emerald-500/20 animate-pulse pointer-events-none" />
-          <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full border border-emerald-500/10 pointer-events-none" />
-
-          {/* Dotted Route Trajectory */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none">
-            <path
-              d="M 20% 35% Q 50% 55% 80% 50%"
-              fill="none"
-              stroke="#059669"
-              strokeWidth="4"
-              strokeDasharray="6 6"
-              className="opacity-70"
-            />
-            {/* Completed Trajectory Path */}
-            <path
-              d="M 20% 35% Q 50% 55% 80% 50%"
-              fill="none"
-              stroke="#34d399"
-              strokeWidth="4"
-              strokeDasharray="200"
-              strokeDashoffset={200 - (transitProgress / 100) * 200}
-              className="transition-all duration-700"
-            />
-          </svg>
-
-          {/* Start Location Pin: Service Professional Base */}
-          <div className="absolute top-[35%] left-[20%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
-            <div className="w-8 h-8 rounded-full bg-slate-900 border-2 border-slate-600 flex items-center justify-center shadow-lg">
-              <Wrench className="w-3.5 h-3.5 text-slate-300" />
+        {/* Tracking Content - Strictly displays after acceptance */}
+        {currentStatus === 'requested' ? (
+          <div className="p-8 rounded-3xl bg-slate-900/90 border border-amber-500/40 text-center space-y-5 animate-in fade-in">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+              <Clock className="w-8 h-8 animate-pulse" />
             </div>
-            <span className="mt-1 px-2 py-0.5 rounded-md bg-slate-950/90 border border-slate-800 text-[9px] font-bold text-slate-400">
-              {pro.name.split(' ')[0]}'s Hub ({pro.location.split(',')[0]})
-            </span>
-          </div>
 
-          {/* Destination Pin: Customer Home */}
-          <div className="absolute top-[50%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
-            <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-emerald-500/30 border-2 border-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/40">
-                <MapPin className="w-5 h-5 text-emerald-300" />
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                Awaiting Service Person Acceptance
+              </span>
+              <h3 className="font-heading text-lg sm:text-xl font-bold text-white mt-2">
+                Live GPS Tracking Unlocks Upon Acceptance
+              </h3>
+              <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+                Your service order has been dispatched to <span className="text-white font-semibold">{pro.name}</span>.
+                Real-time route navigation, live road distance countdown, and technician movement will display here as soon as the service person accepts your booking.
+              </p>
+            </div>
+
+            {/* Service Person Info Card */}
+            <div className="max-w-md mx-auto p-4 rounded-2xl bg-slate-950 border border-slate-800 text-left flex items-center gap-3">
+              <TradeAvatar name={pro.name} category={pro.category} size="md" />
+              <div>
+                <h4 className="text-xs font-bold text-white">{pro.name}</h4>
+                <p className="text-[11px] text-slate-400">{pro.category} Specialist · {pro.location}</p>
+                <p className="text-[10px] text-amber-400 font-semibold mt-0.5">Route Distance: {distanceInfo.formattedDistance} from your address</p>
               </div>
-              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
             </div>
-            <span className="mt-1 px-2.5 py-0.5 rounded-full bg-slate-900 border border-emerald-500/40 text-[10px] font-bold text-white shadow max-w-[140px] truncate text-center">
-              Your Home ({booking.address.split(',')[0]})
-            </span>
-          </div>
 
-          {/* LIVE MOVING TECHNICIAN PIN */}
-          <div
-            className="absolute z-30 flex flex-col items-center transition-all duration-700 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-            style={{
-              left: `${markerLeftPercent}%`,
-              top: `${markerTopPercent}%`,
-            }}
-          >
-            <div className="relative">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-xl shadow-emerald-500/60 ring-4 ring-emerald-500/30">
-                <Navigation className="w-5 h-5 animate-pulse text-slate-950" />
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => advanceStage('accepted', `${pro.name} accepted your booking`)}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+                title="Simulate technician accepting booking"
+              >
+                <CheckCircle className="w-4 h-4 text-slate-950" />
+                <span>Simulate Pro Acceptance (Demo)</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+              >
+                Close & Return
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Live Distance & ETA Stat Strip - COMPUTED FROM PHYSICAL DISTANCE */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Distance to Location
+                </span>
+                <span className="font-mono text-xl sm:text-2xl font-bold text-white">
+                  {transitProgress >= 95 ? '0.0 km' : `${distanceRemaining} km`}
+                </span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">
+                  Calculated from route
+                </span>
               </div>
-              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-300 border-2 border-slate-950 animate-ping" />
+
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+                  Estimated Travel Time
+                </span>
+                <span className="font-mono text-xl sm:text-2xl font-bold text-emerald-400">
+                  {transitProgress >= 95 ? 'Arrived' : `~${etaMinutesRemaining} mins`}
+                </span>
+                <span className="text-[10px] text-emerald-300/80 block mt-0.5">
+                  Based on {initialDistanceKm} km distance
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Transit Vehicle
+                </span>
+                <span className="font-medium text-xs sm:text-sm text-slate-200 block truncate mt-1">
+                  Two-Wheeler Mobile Toolkit
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  KA-03-EM-8821
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                  Safety PIN
+                </span>
+                <span className="font-mono text-xl sm:text-2xl font-bold text-amber-400">
+                  {booking.id.slice(-4).toUpperCase()}
+                </span>
+                <span className="text-[10px] text-slate-400 block mt-0.5">
+                  Share with partner on arrival
+                </span>
+              </div>
             </div>
 
-            <div className="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/95 border border-emerald-500/50 text-[10px] font-bold text-emerald-300 shadow whitespace-nowrap">
-              {transitProgress >= 95 ? (
-                'Arrived at your door'
-              ) : (
-                <>
-                  {pro.name.split(' ')[0]} · {distanceRemaining} km away (~{etaMinutesRemaining}m)
-                </>
-              )}
-            </div>
-          </div>
+            {/* Live Vector Radar & Route Map Visualizer */}
+            <div className="relative w-full h-[280px] sm:h-[320px] rounded-3xl overflow-hidden border border-slate-700/80 bg-[#090f1d] shadow-inner select-none">
+              {/* Subtle Grid Matrix */}
+              <div className="absolute inset-0 opacity-20 bg-[linear-gradient(to_right,#334155_1px,transparent_1px),linear-gradient(to_bottom,#334155_1px,transparent_1px)] bg-[size:32px_32px]" />
 
-          {/* Dynamic route progress overlay bar */}
-          <div className="absolute bottom-3 left-4 right-4 z-20 p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 backdrop-blur-sm flex items-center justify-between text-xs text-slate-300">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Compass className="w-4 h-4 text-emerald-400" />
-              Route: {pro.location.split(',')[0]} → {booking.address.split(',')[0]} ({initialDistanceKm} km total)
-            </span>
-            <span className="text-emerald-400 font-mono font-bold">
-              {transitProgress}% of route traversed
-            </span>
-          </div>
-        </div>
+              {/* Radar Waves */}
+              <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-emerald-500/20 animate-pulse pointer-events-none" />
+              <div className="absolute top-1/2 left-[80%] -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full border border-emerald-500/10 pointer-events-none" />
+
+              {/* Dotted Route Trajectory */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                <path
+                  d="M 20% 35% Q 50% 55% 80% 50%"
+                  fill="none"
+                  stroke="#059669"
+                  strokeWidth="4"
+                  strokeDasharray="6 6"
+                  className="opacity-70"
+                />
+                {/* Completed Trajectory Path */}
+                <path
+                  d="M 20% 35% Q 50% 55% 80% 50%"
+                  fill="none"
+                  stroke="#34d399"
+                  strokeWidth="4"
+                  strokeDasharray="200"
+                  strokeDashoffset={200 - (transitProgress / 100) * 200}
+                  className="transition-all duration-700"
+                />
+              </svg>
+
+              {/* Start Location Pin: Service Professional Base */}
+              <div className="absolute top-[35%] left-[20%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
+                <div className="w-8 h-8 rounded-full bg-slate-900 border-2 border-slate-600 flex items-center justify-center shadow-lg">
+                  <Wrench className="w-3.5 h-3.5 text-slate-300" />
+                </div>
+                <span className="mt-1 px-2 py-0.5 rounded-md bg-slate-950/90 border border-slate-800 text-[9px] font-bold text-slate-400">
+                  {pro.name.split(' ')[0]}'s Hub ({pro.location.split(',')[0]})
+                </span>
+              </div>
+
+              {/* Destination Pin: Customer Home */}
+              <div className="absolute top-[50%] left-[80%] -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full bg-emerald-500/30 border-2 border-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/40">
+                    <MapPin className="w-5 h-5 text-emerald-300" />
+                  </div>
+                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 animate-ping" />
+                </div>
+                <span className="mt-1 px-2.5 py-0.5 rounded-full bg-slate-900 border border-emerald-500/40 text-[10px] font-bold text-white shadow max-w-[140px] truncate text-center">
+                  Your Home ({booking.address.split(',')[0]})
+                </span>
+              </div>
+
+              {/* LIVE MOVING TECHNICIAN PIN */}
+              <div
+                className="absolute z-30 flex flex-col items-center transition-all duration-700 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                style={{
+                  left: `${markerLeftPercent}%`,
+                  top: `${markerTopPercent}%`,
+                }}
+              >
+                <div className="relative">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-xl shadow-emerald-500/60 ring-4 ring-emerald-500/30">
+                    <Navigation className="w-5 h-5 animate-pulse text-slate-950" />
+                  </div>
+                  <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-300 border-2 border-slate-950 animate-ping" />
+                </div>
+
+                <div className="mt-1 px-2 py-0.5 rounded-lg bg-slate-950/95 border border-emerald-500/50 text-[10px] font-bold text-emerald-300 shadow whitespace-nowrap">
+                  {transitProgress >= 95 ? (
+                    'Arrived at your door'
+                  ) : (
+                    <>
+                      {pro.name.split(' ')[0]} · {distanceRemaining} km away (~{etaMinutesRemaining}m)
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic route progress overlay bar */}
+              <div className="absolute bottom-3 left-4 right-4 z-20 p-2.5 rounded-2xl bg-slate-950/90 border border-slate-800 backdrop-blur-sm flex items-center justify-between text-xs text-slate-300">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <Compass className="w-4 h-4 text-emerald-400" />
+                  Route: {pro.location.split(',')[0]} → {booking.address.split(',')[0]} ({initialDistanceKm} km total)
+                </span>
+                <span className="text-emerald-400 font-mono font-bold">
+                  {transitProgress}% of route traversed
+                </span>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Dispatch Progress Steps */}
         <div className="space-y-2">
