@@ -1,0 +1,6 @@
+{
+  "name": "Cooperative Gig Services Platform",
+  "description": "A cooperative digital gig platform connecting local customers with verified service professionals for plumbing, electrical, carpentry, cleaning, emergency repairs, and multi-skill cooperative groups with GigAssist AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
